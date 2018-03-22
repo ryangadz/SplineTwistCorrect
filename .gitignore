@@ -1,0 +1,9 @@
+# UE4 Project directories to ignore
+
+.vscode/*
+Binaries/*
+Intermediate/*
+Saved/*
+Build/*
+DerivedDataCache/*
+
