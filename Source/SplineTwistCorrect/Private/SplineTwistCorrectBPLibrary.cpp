@@ -1,4 +1,4 @@
-// Copyright 1998-2018 Epic Games, Inc. All Rights Reserved.
+// Copyright 2018 Ryan Gadz, Inc. All Rights Reserved.
 
 #include "SplineTwistCorrectBPLibrary.h"
 #include "SplineTwistCorrect.h"
@@ -113,17 +113,19 @@ void USplineTwistCorrectBPLibrary::BuildOffsetSpline(
 
 	for (int i = 0; i <= lastIndex; i++)
 	{
-		upVectorScaled = ((SplineUser->GetUpVectorAtSplinePoint(i, W)) * OffsetDist);
-		tanAtPoint = SplineUser->GetTangentAtSplinePoint(i, W);
-		offsetVector = upVectorScaled.RotateAngleAxis(RotFromUp, tanAtPoint);
-		pointPos = SplineUser->GetLocationAtSplinePoint(i, W) + offsetVector;
+		upVectorScaled =  OffsetDist*(SplineUser->GetUpVectorAtSplinePoint(i, W));
+		tanAtPoint = (SplineUser->GetTangentAtSplinePoint(i, W));
+		offsetVector = upVectorScaled.RotateAngleAxis(RotFromUp, tanAtPoint.GetSafeNormal());
+		pointPos = offsetVector + (SplineUser->GetLocationAtSplinePoint(i, W));
 		SplineOffset->AddSplinePointAtIndex(pointPos, i, W, false);
 
 		SplineOffset->SetTangentAtSplinePoint(i, tanAtPoint, W, false);
 
 		SplineOffset->SetSplinePointType(i, SplineUser->GetSplinePointType(i), false);
 	}
+
 	SplineOffset->UpdateSpline();
+
 	FixTangents(SplineUser, SplineOffset);
 }
 

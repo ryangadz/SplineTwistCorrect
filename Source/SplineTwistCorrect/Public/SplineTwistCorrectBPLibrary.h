@@ -1,4 +1,4 @@
-// Copyright 1998-2018 Epic Games, Inc. All Rights Reserved.
+// Copyright 2018 Ryan Gadz, Inc. All Rights Reserved.
 
 #pragma once
 #include "Runtime/Engine/Classes/Components/SplineComponent.h"
@@ -35,7 +35,7 @@ class USplineTwistCorrectBPLibrary : public UBlueprintFunctionLibrary
 	GENERATED_UCLASS_BODY()
 
     /** Input a spline and ideal subdivision length to get number of subdivisions and calculated length. */
-	UFUNCTION(BlueprintPure, meta = (DisplayName = "Calculate Spline Sub Length", Keywords = "SplineTwistCorrect TwistCorrect SplineCorrect"), Category = "SplineTwistCorrect")
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "Calculate Subdivided Spline", Keywords = "SplineTwistCorrect TwistCorrect SplineCorrect"), Category = "SplineTwistCorrect")
 	static void CalcRailLength(
         const class USplineComponent* Spline, 
         int &number, 
@@ -77,7 +77,7 @@ class USplineTwistCorrectBPLibrary : public UBlueprintFunctionLibrary
         const class USplineComponent *SplineUser,
         class USplineComponent *SplineOffset,
         const float RotFromUp = 0,
-        const float OffsetDist = 100);
+        const float OffsetDist = 30);
 
     /** Input an offset spline to fix the tangents by comparing length of user made spline */
     UFUNCTION(BlueprintCallable, meta = (DisplayName = "Fix Tangents of Offset Spline", Keywords = "SplineTwistCorrect TwistCorrect SplineCorrect"), Category = "SplineTwistCorrect")

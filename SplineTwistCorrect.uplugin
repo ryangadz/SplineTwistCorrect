@@ -1,23 +1,31 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "0.5",
+	"VersionName": "0.6",
 	"FriendlyName": "SplineTwistCorrect",
 	"Description": "Function library to help correct twisted splines for use with spline mesh. ",
 	"Category": "Other",
 	"CreatedBy": "Ryan Gadz",
 	"CreatedByURL": "https://twitter.com/GadzGamz",
 	"DocsURL": "https://github.com/ryangadz/Workshop3_TwistCorrect",
-	"MarketplaceURL": "",
+	"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/3ab1bb3146c34d4098fd2e564f6bd62c",
 	"SupportURL": "https://github.com/ryangadz/Workshop3_TwistCorrect/issues",
+	"EngineVersion": "4.19.0",
 	"CanContainContent": true,
 	"IsBetaVersion": true,
-	"Installed": false,
+	"Installed": true,
 	"Modules": [
 		{
 			"Name": "SplineTwistCorrect",
 			"Type": "Runtime",
-			"LoadingPhase": "PreLoadingScreen"
+			"LoadingPhase": "PreLoadingScreen",
+			"WhitelistPlatforms": 
+			[ 
+				"Win64", 
+				"Win32", 
+				"Mac", 
+				"Android" 
+			]
 		}
-	]
+	]	
 }
