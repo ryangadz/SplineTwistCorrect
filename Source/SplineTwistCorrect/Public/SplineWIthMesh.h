@@ -18,10 +18,6 @@ public:
 	// Sets default values for this component's properties
 	USplineWithMesh(const FObjectInitializer &ObjectInitializer);
 
-//	UPROPERTY()
-//	class USphereComponent *SphereComponent;
-	//class USplineComponent *Spline;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "Static Mesh", Category = "SplineMesh Properties")
 	class UStaticMesh *StaticMesh;
 
@@ -34,27 +30,30 @@ public:
 	UPROPERTY()
 	int32 Number = 1;
 
-	UPROPERTY()
-	bool CanAttach; 
-	
-	UPROPERTY()
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TArray<class USplineMeshComponent*> SplineMeshArray;
-//	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "Spline Mesh", Category = "SplineMesh Properties")
-//	UPROPERTY()
-//	USplineMeshComponent* SplineMesh = nullptr;
 
-	UPROPERTY()
-	AActor *Actor;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	class USplineMeshComponent* SplineMesh;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	class USceneComponent *Root;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	class AActor *Actor;
 
 	void AddMesh();
 
 	void RemoveMesh();
 
+virtual void PostLoadSubobjects( FObjectInstancingGraph* OuterInstanceGraph ) override;
+
 virtual void PostInitProperties() override;
+//virtual void PreInitProperties() override;
 
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-
+	virtual void PreEditChange(UProperty* PropertyThatWillChange) override;
 #endif 
 
 protected:
