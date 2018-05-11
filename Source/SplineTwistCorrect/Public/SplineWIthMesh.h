@@ -30,7 +30,7 @@ public:
 	UPROPERTY()
 	int32 Number = 1;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UPROPERTY( EditAnywhere, Instanced, NoClear,DisplayName = "Spline Mesh Array", Category = "SplineMesh Properties")
 	TArray<class USplineMeshComponent*> SplineMeshArray;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
@@ -42,9 +42,27 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	class AActor *Actor;
 
-	void AddMesh();
+ UFUNCTION(BlueprintCallable)
+	void AddMesh(class AActor * PActor);
+
 
 	void RemoveMesh();
+	
+ UFUNCTION(BlueprintCallable)
+	void AddRootToParent();
+
+#if WITH_EDITORONLY_DATA
+	virtual void Serialize(FArchive& Ar) override;
+#endif
+	virtual void PostLoad() override;
+
+
+	virtual void OnRegister() override;
+
+
+//http://api.unrealengine.com/INT/API/Runtime/Engine/Components/UPrimitiveComponent/GetComponentInstanceData/index.html
+//Called before we throw away components during RerunConstructionScripts, to cache any data we wish to persist across that operation
+//virtual class FActorComponentInstanceData* GetComponentInstanceData() const override;
 
 virtual void PostLoadSubobjects( FObjectInstancingGraph* OuterInstanceGraph ) override;
 
