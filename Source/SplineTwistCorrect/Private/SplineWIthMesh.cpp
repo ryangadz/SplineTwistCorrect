@@ -11,35 +11,14 @@ USplineWithMesh::USplineWithMesh(const FObjectInitializer &ObjectInitializer) : 
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> DefaultMesh(TEXT("/SplineTwistCorrect/DebugShape.DebugShape"));
 	StaticMesh = DefaultMesh.Object;
+
+	//OffsetSpline = ObjectInitializer.CreateDefaultSubobject<USplineComponent>(this, TEXT("OffsetSpline"), true);
 	
+	//CorrectedSpline = ObjectInitializer.CreateDefaultSubobject<USplineComponent>(this, TEXT("CorrectedSpline"), true);
+	//CorrectedSpline->SetVisibility()
 
 	FAttachmentTransformRules AttachRule = FAttachmentTransformRules(EAttachmentRule::KeepRelative, false);
-	//this->UpdateSpline();
-	//Actor = this->GetOwner();
-	// if (Actor != nullptr) // && StaticMesh != nullptr
-	// {
-	// //	RemoveMesh();
-		
-	// 	FTransform ActorTransform = Actor->GetTransform();
-	// 	Root = ObjectInitializer.CreateDefaultSubobject<USceneComponent>(Actor, TEXT("Root"), true);
-	// 	Root->SetMobility(EComponentMobility::Static);
-	// 	Root->SetWorldTransform(ActorTransform);
-	// 	Root->RegisterComponent();
-	// 	//Root->AttachParent(Actor)
-	// 	//Root->CreationMethod = EComponentCreationMethod::UserConstructionScript;
-	// 	// USplineTwistCorrectBPLibrary::CalcRailLength(this, Number, Length, SubSegmentLength);
 
-	// 	// for (int32 i = 0; i < Number; i++)
-	// 	// {
-	// 	// 	SplineMesh = CreateDefaultSubobject<USplineMeshComponent>( TEXT("SplineMesh"));
-
-	// 	// 	SplineMesh->CreationMethod = EComponentCreationMethod::UserConstructionScript;
-	// 	// 	SplineMesh->AttachToComponent(Root, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
-	// 	// 	USplineTwistCorrectBPLibrary::ConfigSplineMesh(i, Length, this, SplineMesh, Actor, StaticMesh);
-	// 	// 	SplineMesh->RegisterComponent();
-	// 	// 	SplineMeshArray.Add(SplineMesh);
-	// 	// }
-	//  }
 	
 }
 
@@ -49,15 +28,35 @@ USplineWithMesh::USplineWithMesh(const FObjectInitializer &ObjectInitializer) : 
 void USplineWithMesh::OnRegister()
 {
 	AddRootToParent();
-	AddMesh(Actor);
+	if (Root != nullptr)
+	{
+		if(bAddDirectionArrows)
+		AddDirectionArrows();
+
+		if(OffsetSpline == nullptr){
+		OffsetSpline = NewObject<USplineComponent>(this);
+		OffsetSpline->AttachToComponent(Root, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
+		}
+	//	OffsetSpline->RegisterComponent();
+	if(CorrectedSpline == nullptr){
+		CorrectedSpline = NewObject<USplineComponent>(this);
+		CorrectedSpline->AttachToComponent(Root, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
+	}
+	//	CorrectedSpline->RegisterComponent();
+		AddMesh(Actor);
+
+		CorrectedSpline->DestroyComponent();
+	}
 	Super::OnRegister();
 }
+
 
 void USplineWithMesh::PostLoad()
 {
 	// AddRootToParent();
 	// AddMesh(Actor);
 	Super::PostLoad();
+
 }
 
 void USplineWithMesh::PostInitProperties()
@@ -83,6 +82,7 @@ void USplineWithMesh::PostLoadSubobjects( FObjectInstancingGraph* OuterInstanceG
 #if WITH_EDITOR
 void USplineWithMesh::PostEditChangeProperty(FPropertyChangedEvent &PropertyChangedEvent)
 {
+
 	//AddRootToParent();
 	//AddMesh(Actor);
 	Super::PostEditChangeProperty(PropertyChangedEvent);
@@ -129,6 +129,8 @@ void USplineWithMesh::AddMesh(class AActor * PActor)
 //	{
 	    RemoveMesh();
 		USplineTwistCorrectBPLibrary::CalcRailLength(this, Number, Length, SubSegmentLength);
+		USplineTwistCorrectBPLibrary::BuildOffsetSpline(this, OffsetSpline, 0.f, 30.f);
+		USplineTwistCorrectBPLibrary::BuildCorrectedSpline(this, OffsetSpline, CorrectedSpline, Length);
 	//	GEngine->AddOnScreenDebugMessage(-1, 4.f, FColor::Red, FString::Printf(TEXT("number %i"), Number));
 	//	SplineMeshArray.SetNum(Number, true);
 	//	GEngine->AddOnScreenDebugMessage(-1, 4.f, FColor::Red, FString::Printf(TEXT("SetArray %i"), SplineMeshArray.Num()));
@@ -137,7 +139,7 @@ void USplineWithMesh::AddMesh(class AActor * PActor)
 
 			SplineMesh = NewObject<USplineMeshComponent>(this);
 			SplineMesh->AttachToComponent(Root, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
-			USplineTwistCorrectBPLibrary::ConfigSplineMesh(i, Length, this, SplineMesh, Actor, StaticMesh);
+			USplineTwistCorrectBPLibrary::ConfigSplineMesh(i, Length, CorrectedSpline, SplineMesh, Actor, StaticMesh);
 
 			SplineMesh->RegisterComponent();
 			SplineMeshArray.Add(SplineMesh);
@@ -157,7 +159,6 @@ void USplineWithMesh::RemoveMesh()
 		SplineMeshArray[i]->DestroyComponent(false);
 	}
 	SplineMeshArray.Empty();
-
 }
 
 void USplineWithMesh::AddRootToParent()
@@ -184,3 +185,31 @@ void USplineWithMesh::Serialize(FArchive& Ar)
 Super::Serialize(Ar);
 }
 #endif
+
+void USplineWithMesh::AddDirectionArrows()
+{
+	int32 numSplinePoints = this->GetNumberOfSplinePoints();
+	RemoveDirectionArrows();
+	for(int32 i = 0; i < numSplinePoints; i++ )
+	{
+		Arrow = NewObject<UArrowComponent>(this);
+		Arrow->AttachToComponent(Root, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
+		Arrow->SetRelativeLocation(this->GetLocationAtSplinePoint(i,CoordSpace));
+		FVector upVector = this->GetUpVectorAtSplinePoint(i, CoordSpace);
+		Arrow->SetRelativeRotation(UKismetMathLibrary::MakeRotFromX(upVector));
+		Arrow->RegisterComponent();
+		DirectionArrows.Add(Arrow);
+	
+	}
+}
+
+void USplineWithMesh::RemoveDirectionArrows()
+{
+	int32 arrowNum = DirectionArrows.Num();
+	for (int32 i = 0; i < arrowNum; i++)
+	{
+		if (DirectionArrows[i] != nullptr)
+		DirectionArrows[i]->DestroyComponent(false);
+	}
+	DirectionArrows.Empty();
+}

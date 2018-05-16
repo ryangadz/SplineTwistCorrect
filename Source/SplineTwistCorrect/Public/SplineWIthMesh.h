@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/SplineComponent.h"
+#include "Components/ArrowComponent.h"
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
 #include "SplineTwistCorrectBPLibrary.h"
 #include "SplineWithMesh.generated.h"
@@ -30,8 +31,21 @@ public:
 	UPROPERTY()
 	int32 Number = 1;
 
+	UPROPERTY( EditAnywhere, Instanced, NoClear,DisplayName = "Offset Spline", Category = "SplineMesh Properties")
+	class USplineComponent* OffsetSpline;
+
+	//	UPROPERTY( EditAnywhere, Instanced, NoClear,DisplayName = "Corrected Spline", Category = "SplineMesh Properties")
+
+	class USplineComponent* CorrectedSpline;
+
 	UPROPERTY( EditAnywhere, Instanced, NoClear,DisplayName = "Spline Mesh Array", Category = "SplineMesh Properties")
 	TArray<class USplineMeshComponent*> SplineMeshArray;
+
+	UPROPERTY( EditAnywhere, Instanced, NoClear,DisplayName = "Arrow Array", Category = "Spline Properties")
+	TArray<class UArrowComponent*> DirectionArrows;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	class UArrowComponent* Arrow;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	class USplineMeshComponent* SplineMesh;
@@ -42,7 +56,7 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	class AActor *Actor;
 
- UFUNCTION(BlueprintCallable)
+ 	UFUNCTION(BlueprintCallable)
 	void AddMesh(class AActor * PActor);
 
 
@@ -50,6 +64,20 @@ public:
 	
  UFUNCTION(BlueprintCallable)
 	void AddRootToParent();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "Add Direction Arrows", Category = "Spline Properties")
+	bool bAddDirectionArrows = true; 
+
+UPROPERTY()
+	bool bArrows;
+
+	ESplineCoordinateSpace::Type CoordSpace = ESplineCoordinateSpace::Local;
+
+	UFUNCTION(BlueprintCallable)
+	void AddDirectionArrows();
+
+	UFUNCTION()
+	void RemoveDirectionArrows();
 
 #if WITH_EDITORONLY_DATA
 	virtual void Serialize(FArchive& Ar) override;
