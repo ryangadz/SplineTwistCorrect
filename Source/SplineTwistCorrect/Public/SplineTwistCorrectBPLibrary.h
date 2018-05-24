@@ -68,7 +68,8 @@ class USplineTwistCorrectBPLibrary : public UBlueprintFunctionLibrary
         const float &Length, 
         const class USplineComponent *SplineFinal, 
         class USplineMeshComponent *SplineMesh, 
-        const class AActor *Actor, 
+        const class AActor *Actor,
+        class UMaterialInterface* Material, 
         class UStaticMesh *StaticMesh);
 
     /** Input a Spline to offset with offset distance and rotation from the spline's up vector at each point */

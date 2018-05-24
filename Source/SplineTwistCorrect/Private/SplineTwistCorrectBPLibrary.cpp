@@ -70,6 +70,7 @@ void USplineTwistCorrectBPLibrary::ConfigSplineMesh(
 	const class USplineComponent *SplineFinal,
 	class USplineMeshComponent *SplineMesh,
 	const class AActor *Actor,
+	class UMaterialInterface *Material,
 	class UStaticMesh *StaticMesh)
 {
 	if (!SplineFinal || !SplineMesh || !Actor)
@@ -90,7 +91,7 @@ void USplineTwistCorrectBPLibrary::ConfigSplineMesh(
 	float Rotation = 0;
 	CalcRotFromUp(Rotation, SplineFinal, Index, Length);
 	SplineMesh->SetEndRoll(Rotation, false);
-
+	SplineMesh->SetMaterial(0,Material);
 	SplineMesh->SetStaticMesh(StaticMesh);
 }
 

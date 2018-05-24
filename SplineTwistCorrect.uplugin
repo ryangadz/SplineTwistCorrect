@@ -1,7 +1,7 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "0.6",
+	"VersionName": "0.7",
 	"FriendlyName": "SplineTwistCorrect",
 	"Description": "Function library to help correct twisted splines for use with spline mesh. ",
 	"Category": "Other",
@@ -19,13 +19,12 @@
 			"Name": "SplineTwistCorrect",
 			"Type": "Runtime",
 			"LoadingPhase": "PreLoadingScreen",
-			"WhitelistPlatforms": 
-			[ 
-				"Win64", 
-				"Win32", 
-				"Mac", 
-				"Android" 
+			"WhitelistPlatforms": [
+				"Win64",
+				"Win32",
+				"Mac",
+				"Android"
 			]
 		}
-	]	
+	]
 }

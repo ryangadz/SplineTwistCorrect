@@ -9,6 +9,13 @@
 #include "SplineTwistCorrectBPLibrary.h"
 #include "SplineWithMesh.generated.h"
 
+UENUM(BlueprintType)
+enum class EMeshToUse : uint8
+{
+	E_Default UMETA(DisplayName = "Default"),
+	E_Array UMETA(DisplayName = "Index From Array"),
+	E_Random UMETA(DisplayName = "Random From Array")
+};
 
 UCLASS( ClassGroup=(SplineTwistCorrect), meta=(BlueprintSpawnableComponent) )
 class SPLINETWISTCORRECT_API USplineWithMesh : public USplineComponent
@@ -19,41 +26,64 @@ public:
 	// Sets default values for this component's properties
 	USplineWithMesh(const FObjectInitializer &ObjectInitializer);
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "Static Mesh", Category = "SplineMesh Properties")
-	class UStaticMesh *StaticMesh;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "Mesh To Use", Category = "SplineMesh Properties")
+	EMeshToUse MeshToUse;
+	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "Sub-Segment Length", Category = "SplineMesh Properties")
 	float SubSegmentLength = 100.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "Static Mesh Default", Category = "SplineMesh Properties")
+	class UStaticMesh *StaticMeshDefault;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "Static Mesh Array", Category = "SplineMesh Properties")
+	TArray <class UStaticMesh*> StaticMeshArray;
+
+	UPROPERTY()
+	class UStaticMesh *StaticMesh;
+
 	UPROPERTY()
 	float Length = 100.f;
 
-	UPROPERTY()
-	int32 Number = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, NoClear, DisplayName = "Sub-Segment Number", Category = "Spline Properties")
+	int32 Number;
 
-	UPROPERTY( EditAnywhere, Instanced, NoClear,DisplayName = "Offset Spline", Category = "SplineMesh Properties")
+	//UPROPERTY( EditAnywhere,  NoClear,DisplayName = "Offset Spline", Category = "SplineMesh Properties")
+	UPROPERTY()
 	class USplineComponent* OffsetSpline;
 
-	//	UPROPERTY( EditAnywhere, Instanced, NoClear,DisplayName = "Corrected Spline", Category = "SplineMesh Properties")
-
+ 	//	UPROPERTY( EditAnywhere, Instanced, NoClear,DisplayName = "Corrected Spline", Category = "SplineMesh Properties")
+	UPROPERTY()
 	class USplineComponent* CorrectedSpline;
 
-	UPROPERTY( EditAnywhere, Instanced, NoClear,DisplayName = "Spline Mesh Array", Category = "SplineMesh Properties")
+	//UPROPERTY( EditAnywhere, NoClear,DisplayName = "Spline Mesh Array", Category = "SplineMesh Properties")
 	TArray<class USplineMeshComponent*> SplineMeshArray;
 
-	UPROPERTY( EditAnywhere, Instanced, NoClear,DisplayName = "Arrow Array", Category = "Spline Properties")
+	UPROPERTY( EditAnywhere, BlueprintReadWrite,DisplayName = "Material Default", Category = "SplineMesh Properties")
+	class UMaterialInterface* MaterialDefault;
+
+	UPROPERTY( EditAnywhere, BlueprintReadWrite,DisplayName = "Material Array", Category = "SplineMesh Properties")
+	TArray<class UMaterialInterface*> MaterialArray;
+
+
+
+	//UPROPERTY( EditAnywhere, BlueprintReadWrite,DisplayName = "Material", Category = "SplineMesh Properties")
+	class UMaterialInterface* Material;
+
+
+	UPROPERTY()
 	TArray<class UArrowComponent*> DirectionArrows;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UPROPERTY()
 	class UArrowComponent* Arrow;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UPROPERTY()
 	class USplineMeshComponent* SplineMesh;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UPROPERTY()
 	class USceneComponent *Root;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UPROPERTY()
 	class AActor *Actor;
 
  	UFUNCTION(BlueprintCallable)

@@ -9,9 +9,15 @@ USplineWithMesh::USplineWithMesh(const FObjectInitializer &ObjectInitializer) : 
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> DefaultMesh(TEXT("/SplineTwistCorrect/DebugShape.DebugShape"));
-	StaticMesh = DefaultMesh.Object;
+	static ConstructorHelpers::FObjectFinder<UObject> DefaultMesh(TEXT("StaticMesh'/SplineTwistCorrect/DebugShape.DebugShape'"));
+	if (DefaultMesh.Object != NULL)                             
+	StaticMeshDefault = (UStaticMesh*)DefaultMesh.Object; 
 
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> DefaultMaterial(TEXT("/SplineTwistCorrect/M_Track.M_Track"));
+	if (MaterialDefault.Object != NULL)   
+	MaterialDefault = DefaultMaterial.Object;
+
+	MaterialArray.Empty();
 	//OffsetSpline = ObjectInitializer.CreateDefaultSubobject<USplineComponent>(this, TEXT("OffsetSpline"), true);
 	
 	//CorrectedSpline = ObjectInitializer.CreateDefaultSubobject<USplineComponent>(this, TEXT("CorrectedSpline"), true);
@@ -19,6 +25,7 @@ USplineWithMesh::USplineWithMesh(const FObjectInitializer &ObjectInitializer) : 
 
 	FAttachmentTransformRules AttachRule = FAttachmentTransformRules(EAttachmentRule::KeepRelative, false);
 
+	USplineTwistCorrectBPLibrary::CalcRailLength(this, Number, Length, SubSegmentLength);
 	
 }
 
@@ -30,26 +37,27 @@ void USplineWithMesh::OnRegister()
 	AddRootToParent();
 	if (Root != nullptr)
 	{
-		if(bAddDirectionArrows)
-		AddDirectionArrows();
+		if (bAddDirectionArrows)
+			AddDirectionArrows();
 
-		if(OffsetSpline == nullptr){
-		OffsetSpline = NewObject<USplineComponent>(this);
-		OffsetSpline->AttachToComponent(Root, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
+		if (OffsetSpline == nullptr)
+		{
+			OffsetSpline = NewObject<USplineComponent>(this);
+			OffsetSpline->AttachToComponent(Root, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
 		}
-	//	OffsetSpline->RegisterComponent();
-	if(CorrectedSpline == nullptr){
-		CorrectedSpline = NewObject<USplineComponent>(this);
-		CorrectedSpline->AttachToComponent(Root, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
-	}
-	//	CorrectedSpline->RegisterComponent();
-		AddMesh(Actor);
 
-		CorrectedSpline->DestroyComponent();
+		if (CorrectedSpline == nullptr)
+		{
+			CorrectedSpline = NewObject<USplineComponent>(this);
+			CorrectedSpline->AttachToComponent(Root, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
+		}
+
+		AddMesh(Actor);
+		if (CorrectedSpline != nullptr)
+			CorrectedSpline->DestroyComponent();
 	}
 	Super::OnRegister();
 }
-
 
 void USplineWithMesh::PostLoad()
 {
@@ -64,7 +72,7 @@ void USplineWithMesh::PostInitProperties()
 //	RemoveMesh();
 //	AddRootToParent();
 	Super::PostInitProperties();
-
+USplineTwistCorrectBPLibrary::CalcRailLength(this, Number, Length, SubSegmentLength);
 //	AddMesh(Actor);
 //AddRootToParent();
 }
@@ -92,6 +100,7 @@ void USplineWithMesh::PostEditChangeProperty(FPropertyChangedEvent &PropertyChan
 
 void USplineWithMesh::PreEditChange(UProperty* PropertyThatWillChange)
 {
+	USplineTwistCorrectBPLibrary::CalcRailLength(this, Number, Length, SubSegmentLength);
 	Super::PreEditChange(PropertyThatWillChange);
 //	RemoveMesh();
 	// AddRootToParent();
@@ -118,36 +127,58 @@ void USplineWithMesh::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	// ...
 }
 
-void USplineWithMesh::AddMesh(class AActor * PActor)
+void USplineWithMesh::AddMesh(class AActor *PActor)
 {
 	//http://www.mike-purvis.com/?p=288 How to make Component with Billboard SubComponent
 	Actor = this->GetOwner();
 	//https://answers.unrealengine.com/questions/345109/create-and-attach-custom-actor-component.html
 	//https://forums.unrealengine.com/development-discussion/c-gameplay-programming/71644-c-spline-creates-hundreds-of-meshes
 	//AActor *Actor = this->GetOwner();
-//	if (Actor != nullptr) // && StaticMesh != nullptr
-//	{
-	    RemoveMesh();
-		USplineTwistCorrectBPLibrary::CalcRailLength(this, Number, Length, SubSegmentLength);
-		USplineTwistCorrectBPLibrary::BuildOffsetSpline(this, OffsetSpline, 0.f, 30.f);
-		USplineTwistCorrectBPLibrary::BuildCorrectedSpline(this, OffsetSpline, CorrectedSpline, Length);
+
+	RemoveMesh();
+	USplineTwistCorrectBPLibrary::CalcRailLength(this, Number, Length, SubSegmentLength);
+	USplineTwistCorrectBPLibrary::BuildOffsetSpline(this, OffsetSpline, 0.f, 30.f);
+	USplineTwistCorrectBPLibrary::BuildCorrectedSpline(this, OffsetSpline, CorrectedSpline, Length);
 	//	GEngine->AddOnScreenDebugMessage(-1, 4.f, FColor::Red, FString::Printf(TEXT("number %i"), Number));
 	//	SplineMeshArray.SetNum(Number, true);
 	//	GEngine->AddOnScreenDebugMessage(-1, 4.f, FColor::Red, FString::Printf(TEXT("SetArray %i"), SplineMeshArray.Num()));
-		for (int32 i = 0; i < Number; i++)
+	for (int32 i = 0; i < Number; i++)
+	{
+
+		SplineMesh = NewObject<USplineMeshComponent>(this);
+		SplineMesh->AttachToComponent(Root, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
+		if (MaterialArray.Num() > i)
 		{
+			Material = (MaterialArray[i]) ? MaterialArray[i] : MaterialDefault;
+		}
+		else
+			Material = MaterialDefault;
 
-			SplineMesh = NewObject<USplineMeshComponent>(this);
-			SplineMesh->AttachToComponent(Root, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
-			USplineTwistCorrectBPLibrary::ConfigSplineMesh(i, Length, CorrectedSpline, SplineMesh, Actor, StaticMesh);
+		if (MeshToUse == EMeshToUse::E_Array)
+		{
+			if (StaticMeshArray.Num() > i)
+			{
+				StaticMesh = (StaticMeshArray[i]) ? StaticMeshArray[i] : StaticMeshDefault;
+			}
+			else StaticMesh = StaticMeshDefault;
+		}
+		else if (MeshToUse == EMeshToUse::E_Random)
+		{
+			if (StaticMeshArray.Num() > i)
+			{
+				//TODO clean this part up
+				//if (StaticMeshArray.Num()  0 )
+				int32 random = FMath::RandRange(0, FMath::Clamp(StaticMeshArray.Num() - 1, 0, 10000));
+				StaticMesh = (StaticMeshArray[random]) ? StaticMeshArray[random] : StaticMeshDefault;
+			}
+			else StaticMesh = StaticMeshDefault;
+		}
+		else StaticMesh = StaticMeshDefault;
+		USplineTwistCorrectBPLibrary::ConfigSplineMesh(i, Length, CorrectedSpline, SplineMesh, Actor, Material, StaticMesh);
 
-			SplineMesh->RegisterComponent();
-			SplineMeshArray.Add(SplineMesh);
-	//	}
-
+		SplineMesh->RegisterComponent();
+		SplineMeshArray.Add(SplineMesh);
 	}
-
-
 }
 
 void USplineWithMesh::RemoveMesh()
