@@ -9,12 +9,12 @@ USplineWithMesh::USplineWithMesh(const FObjectInitializer &ObjectInitializer) : 
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 
-	static ConstructorHelpers::FObjectFinder<UObject> DefaultMesh(TEXT("StaticMesh'/SplineTwistCorrect/DebugShape.DebugShape'"));
+	static ConstructorHelpers::FObjectFinder<UObject> DefaultMesh(TEXT("StaticMesh'/SplineTwistCorrect/SM_DebugSpline.SM_DebugSpline'"));
 	if (DefaultMesh.Object != NULL)                             
 	StaticMeshDefault = (UStaticMesh*)DefaultMesh.Object; 
 
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> DefaultMaterial(TEXT("/SplineTwistCorrect/M_Track.M_Track"));
-	if (MaterialDefault.Object != NULL)   
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> DefaultMaterial(TEXT("Material'/SplineTwistCorrect/M_DebugSpline.M_DebugSpline'"));
+	if (DefaultMaterial.Object != NULL)   
 	MaterialDefault = DefaultMaterial.Object;
 
 	MaterialArray.Empty();
@@ -154,26 +154,21 @@ void USplineWithMesh::AddMesh(class AActor *PActor)
 		else
 			Material = MaterialDefault;
 
-		if (MeshToUse == EMeshToUse::E_Array)
+		if ( MeshToUse != EMeshToUse::E_Default)
 		{
-			if (StaticMeshArray.Num() > i)
+			if (StaticMeshArray.Num() > i && MeshToUse == EMeshToUse::E_Array)
 			{
 				StaticMesh = (StaticMeshArray[i]) ? StaticMeshArray[i] : StaticMeshDefault;
 			}
-			else StaticMesh = StaticMeshDefault;
-		}
-		else if (MeshToUse == EMeshToUse::E_Random)
-		{
-			if (StaticMeshArray.Num() > i)
+			else if (StaticMeshArray.Num() >= 1 && MeshToUse == EMeshToUse::E_Random)
 			{
-				//TODO clean this part up
-				//if (StaticMeshArray.Num()  0 )
-				int32 random = FMath::RandRange(0, FMath::Clamp(StaticMeshArray.Num() - 1, 0, 10000));
+
+				int32 random = FMath::RandRange(0, StaticMeshArray.Num() - 1);
 				StaticMesh = (StaticMeshArray[random]) ? StaticMeshArray[random] : StaticMeshDefault;
 			}
-			else StaticMesh = StaticMeshDefault;
 		}
-		else StaticMesh = StaticMeshDefault;
+		else
+			StaticMesh = StaticMeshDefault;
 		USplineTwistCorrectBPLibrary::ConfigSplineMesh(i, Length, CorrectedSpline, SplineMesh, Actor, Material, StaticMesh);
 
 		SplineMesh->RegisterComponent();
