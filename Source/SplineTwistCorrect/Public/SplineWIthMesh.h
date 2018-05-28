@@ -86,13 +86,16 @@ public:
 	UPROPERTY()
 	class AActor *Actor;
 
- 	UFUNCTION(BlueprintCallable)
+
+//removed from blueprint
+ 	UFUNCTION()
 	void AddMesh(class AActor * PActor);
 
 
 	void RemoveMesh();
-	
- UFUNCTION(BlueprintCallable)
+
+//removed from blueprint
+ UFUNCTION()
 	void AddRootToParent();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "Add Direction Arrows", Category = "Spline Properties")
@@ -103,7 +106,9 @@ UPROPERTY()
 
 	ESplineCoordinateSpace::Type CoordSpace = ESplineCoordinateSpace::Local;
 
-	UFUNCTION(BlueprintCallable)
+
+//removed from blueprint
+	UFUNCTION()
 	void AddDirectionArrows();
 
 	UFUNCTION()
