@@ -88,14 +88,14 @@ public:
 
 
 //TODO remove from blueprint
- 	UFUNCTION(BlueprintCallable)
+ //	UFUNCTION(BlueprintCallable)
 	void AddMesh(class AActor * PActor);
 
 
 	void RemoveMesh();
 
 //TODO remove from blueprint
- UFUNCTION(BlueprintCallable)
+ //UFUNCTION(BlueprintCallable)
 	void AddRootToParent();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "Add Direction Arrows", Category = "Spline Properties")
@@ -108,7 +108,7 @@ UPROPERTY()
 
 
 //TODO remove from blueprint
-	UFUNCTION(BlueprintCallable)
+//	UFUNCTION(BlueprintCallable)
 	void AddDirectionArrows();
 
 	UFUNCTION()
