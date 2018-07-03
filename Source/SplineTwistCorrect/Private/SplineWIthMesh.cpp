@@ -23,6 +23,12 @@ USplineWithMesh::USplineWithMesh(const FObjectInitializer &ObjectInitializer) : 
 	//CorrectedSpline = ObjectInitializer.CreateDefaultSubobject<USplineComponent>(this, TEXT("CorrectedSpline"), true);
 	//CorrectedSpline->SetVisibility()
 
+	static ConstructorHelpers::FObjectFinder<UObject> DefaultScaleCurve(TEXT("CurveVector'/SplineTwistCorrect/C_SplineMeshScale.C_SplineMeshScale'"));
+	if (DefaultScaleCurve.Object != NULL)                             
+	ScaleCurve = (UCurveVector*)DefaultScaleCurve.Object; 
+		
+
+
 	FAttachmentTransformRules AttachRule = FAttachmentTransformRules(EAttachmentRule::KeepRelative, false);
 
 	USplineTwistCorrectBPLibrary::CalcRailLength(this, Number, Length, SubSegmentLength);
@@ -53,8 +59,8 @@ void USplineWithMesh::OnRegister()
 		}
 
 		AddMesh(Actor);
-		if (CorrectedSpline != nullptr)
-			CorrectedSpline->DestroyComponent();
+		// if (CorrectedSpline != nullptr)
+		// 	CorrectedSpline->DestroyComponent();
 	}
 	Super::OnRegister();
 }
@@ -73,6 +79,8 @@ void USplineWithMesh::PostInitProperties()
 //	AddRootToParent();
 	Super::PostInitProperties();
 USplineTwistCorrectBPLibrary::CalcRailLength(this, Number, Length, SubSegmentLength);
+
+
 //	AddMesh(Actor);
 //AddRootToParent();
 }
@@ -88,14 +96,41 @@ void USplineWithMesh::PostLoadSubobjects( FObjectInstancingGraph* OuterInstanceG
 }
 
 #if WITH_EDITOR
-void USplineWithMesh::PostEditChangeProperty(FPropertyChangedEvent &PropertyChangedEvent)
+bool USplineWithMesh::CanEditChange(const UProperty *InProperty) const
 {
 
-	//AddRootToParent();
-	//AddMesh(Actor);
+	
+	if (InProperty)
+	{
+		//grey out uproperty if scaling type does not use it
+		FString PropertyName = InProperty->GetName();
+		if (FCString::Strcmp(*PropertyName, TEXT("Scale")) == 0)
+		{
+			return MeshScalingType == EMeshScalingType::E_Numerical;
+		}
+		else if (FCString::Strcmp(*PropertyName, TEXT("ScaleCurve")) == 0)
+		{
+			return (MeshScalingType == EMeshScalingType::E_UniformCurve || MeshScalingType == EMeshScalingType::E_NonUniformCurve);
+		}
+
+
+
+	}
+	return Super::CanEditChange(InProperty);
+}
+#endif
+
+#if WITH_EDITOR
+void USplineWithMesh::PostEditChangeProperty(FPropertyChangedEvent &PropertyChangedEvent)
+{
 	Super::PostEditChangeProperty(PropertyChangedEvent);
+	FName MemberPropertyChanged = (PropertyChangedEvent.MemberProperty ? PropertyChangedEvent.MemberProperty->GetFName() : NAME_None);
 
-
+	// if ((MemberPropertyChanged == GET_MEMBER_NAME_CHECKED(USplineWithMesh, bClosedLoop)))
+	// {
+		// OffsetSpline->SetClosedLoop(this->IsClosedLoop(), true);
+		// CorrectedSpline->SetClosedLoop(this->IsClosedLoop(), true);
+	// }
 }
 
 void USplineWithMesh::PreEditChange(UProperty* PropertyThatWillChange)
@@ -137,6 +172,8 @@ void USplineWithMesh::AddMesh(class AActor *PActor)
 
 	RemoveMesh();
 	USplineTwistCorrectBPLibrary::CalcRailLength(this, Number, Length, SubSegmentLength);
+	OffsetSpline->SetClosedLoop(this->IsClosedLoop(), true);
+	CorrectedSpline->SetClosedLoop(this->IsClosedLoop(), true);
 	USplineTwistCorrectBPLibrary::BuildOffsetSpline(this, OffsetSpline, 0.f, 30.f);
 	USplineTwistCorrectBPLibrary::BuildCorrectedSpline(this, OffsetSpline, CorrectedSpline, Length);
 	//	GEngine->AddOnScreenDebugMessage(-1, 4.f, FColor::Red, FString::Printf(TEXT("number %i"), Number));
@@ -169,7 +206,7 @@ void USplineWithMesh::AddMesh(class AActor *PActor)
 		}
 		else
 			StaticMesh = StaticMeshDefault;
-		USplineTwistCorrectBPLibrary::ConfigSplineMesh(i, Length, CorrectedSpline, SplineMesh, Actor, Material, StaticMesh);
+		USplineTwistCorrectBPLibrary::ConfigSplineMesh(i, Length, CorrectedSpline, SplineMesh, Actor, Material, StaticMesh, GetScaleMesh(i));
 
 		SplineMesh->RegisterComponent();
 		SplineMeshArray.Add(SplineMesh);
@@ -238,4 +275,50 @@ void USplineWithMesh::RemoveDirectionArrows()
 		DirectionArrows[i]->DestroyComponent(false);
 	}
 	DirectionArrows.Empty();
+}
+
+// FStartEndScale USplineWithMesh::GetScaleMesh()
+// {
+// 	struct FStartEndScale StartEndScale;
+// 	if (MeshScalingType == EMeshScalingType::E_Numerical)
+// 		{
+
+			
+// 				StartEndScale.Start = FVector2D(Scale, Scale);
+// 				StartEndScale.End = Vector2D(Scale, Scale);
+			 
+			
+// 		}
+// 	return StartEndScale;
+// }
+
+FStartEndScale USplineWithMesh::GetScaleMesh(int i)
+{
+	float fi = float(i);
+	struct FStartEndScale StartEndScale;
+	if (MeshScalingType == EMeshScalingType::E_Numerical)
+	{
+		StartEndScale.Start = FVector2D(Scale, Scale);
+		StartEndScale.End = FVector2D(Scale, Scale);
+	}
+	else if (MeshScalingType == EMeshScalingType::E_UniformCurve)
+	{
+		FVector scaleS;
+		FVector scaleE;
+		scaleS = ScaleCurve->GetVectorValue(fi/(CorrectedSpline->GetNumberOfSplinePoints()-1));
+		scaleE = ScaleCurve->GetVectorValue((fi+1)/(CorrectedSpline->GetNumberOfSplinePoints()-1));
+		StartEndScale.Start = FVector2D(scaleS.X, scaleS.X);
+		StartEndScale.End = FVector2D(scaleE.X, scaleE.X);
+	}
+	else if (MeshScalingType == EMeshScalingType::E_NonUniformCurve)
+	{
+		FVector scaleS;
+		FVector scaleE;
+		scaleS = ScaleCurve->GetVectorValue(fi/(CorrectedSpline->GetNumberOfSplinePoints()-1));
+		scaleE = ScaleCurve->GetVectorValue((fi+1)/(CorrectedSpline->GetNumberOfSplinePoints()-1));
+		StartEndScale.Start = FVector2D(scaleS.X, scaleS.Y);
+		StartEndScale.End = FVector2D(scaleE.X, scaleE.Y);
+	}
+
+	return StartEndScale;
 }

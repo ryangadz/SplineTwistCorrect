@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "Components/SplineComponent.h"
 #include "Components/ArrowComponent.h"
+#include "Runtime/Engine/Classes/Curves/CurveVector.h"
+#include "SplineMeshStructsPCH.h"
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
 #include "SplineTwistCorrectBPLibrary.h"
 #include "SplineWithMesh.generated.h"
@@ -15,6 +17,15 @@ enum class EMeshToUse : uint8
 	E_Default UMETA(DisplayName = "Default"),
 	E_Array UMETA(DisplayName = "Index From Array"),
 	E_Random UMETA(DisplayName = "Random From Array")
+};
+
+UENUM(BlueprintType)
+enum class EMeshScalingType : uint8
+{
+	E_None UMETA(DisplayName = "None"),
+	E_Numerical UMETA(DisplayName = "Numerical"),
+	E_UniformCurve UMETA(DisplayName = "Uniform from Curve"),
+	E_NonUniformCurve UMETA(DisplayName = "X and Y from Curve")
 };
 
 UCLASS( ClassGroup=(SplineTwistCorrect), meta=(BlueprintSpawnableComponent) )
@@ -87,28 +98,40 @@ public:
 	class AActor *Actor;
 
 
-//TODO remove from blueprint
- //	UFUNCTION(BlueprintCallable)
+
+	UFUNCTION()
 	void AddMesh(class AActor * PActor);
 
 
 	void RemoveMesh();
 
-//TODO remove from blueprint
- //UFUNCTION(BlueprintCallable)
+ 	UFUNCTION()
 	void AddRootToParent();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, DisplayName = "Add Direction Arrows", Category = "Spline Properties")
 	bool bAddDirectionArrows = true; 
 
-UPROPERTY()
+	UPROPERTY()
 	bool bArrows;
 
 	ESplineCoordinateSpace::Type CoordSpace = ESplineCoordinateSpace::Local;
 
+	UPROPERTY( EditAnywhere, BlueprintReadWrite,DisplayName = "Mesh Scaling Type", Category = "SplineMesh Properties")
+	EMeshScalingType MeshScalingType;
+#if WITH_EDITOR
+    virtual bool CanEditChange(const UProperty* InProperty) const override;
+#endif
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,DisplayName = "Numerical Scaling", Category = "SplineMesh Properties")
+	float Scale = 1.f;
 
-//TODO remove from blueprint
-//	UFUNCTION(BlueprintCallable)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,DisplayName = "Scale Curve", Category = "SplineMesh Properties")
+	class UCurveVector *ScaleCurve;
+
+	UFUNCTION()
+	FStartEndScale GetScaleMesh(int i);
+
+
+	UFUNCTION()
 	void AddDirectionArrows();
 
 	UFUNCTION()

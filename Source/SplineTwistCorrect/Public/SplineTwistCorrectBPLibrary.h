@@ -5,6 +5,7 @@
 #include "Runtime/Engine/Classes/Components/SplineMeshComponent.h"
 #include "Runtime/Engine/Classes/GameFramework/Actor.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "SplineMeshStructsPCH.h"
 #include "Runtime/Engine/Classes/Kismet/KismetMathLibrary.h"
 #include "SplineTwistCorrectBPLibrary.generated.h"
  
@@ -70,7 +71,8 @@ class USplineTwistCorrectBPLibrary : public UBlueprintFunctionLibrary
         class USplineMeshComponent *SplineMesh, 
         const class AActor *Actor,
         class UMaterialInterface* Material, 
-        class UStaticMesh *StaticMesh);
+        class UStaticMesh *StaticMesh,
+        const struct FStartEndScale StartEndScale);
 
     /** Input a Spline to offset with offset distance and rotation from the spline's up vector at each point */
     UFUNCTION(BlueprintCallable, meta = (DisplayName = "Build Offset Spline", Keywords = "SplineTwistCorrect TwistCorrect SplineCorrect"), Category = "SplineTwistCorrect")
