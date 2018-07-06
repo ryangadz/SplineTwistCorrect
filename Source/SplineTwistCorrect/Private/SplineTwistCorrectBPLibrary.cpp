@@ -72,7 +72,8 @@ void USplineTwistCorrectBPLibrary::ConfigSplineMesh(
 	const class AActor *Actor,
 	class UMaterialInterface *Material,
 	class UStaticMesh *StaticMesh,
-	const FStartEndScale StartEndScale)
+	const FStartEndScale StartEndScale,
+	const float Roll)
 {
 	if (!SplineFinal || !SplineMesh || !Actor)
 		return;
@@ -91,6 +92,9 @@ void USplineTwistCorrectBPLibrary::ConfigSplineMesh(
 
 	float Rotation = 0;
 	CalcRotFromUp(Rotation, SplineFinal, Index, Length);
+
+	Rotation = Rotation + FMath::DegreesToRadians(Roll);
+	SplineMesh->SetStartRoll(FMath::DegreesToRadians(Roll), false);
 	SplineMesh->SetEndRoll(Rotation, false);
 	SplineMesh->SetMaterial(0,Material);
 
@@ -205,6 +209,7 @@ void USplineTwistCorrectBPLibrary::BuildCorrectedSpline(
 		
 		tangent = length*((SplineUser->GetTangentAtDistanceAlongSpline(i*length,W)).GetSafeNormal());
 		SplineFinal->SetTangentAtSplinePoint(i, tangent, W, false);
+	//	SplineFinal->SetScaleAtSplinePoint(i, )
 	}
 	SplineFinal->UpdateSpline();
 }

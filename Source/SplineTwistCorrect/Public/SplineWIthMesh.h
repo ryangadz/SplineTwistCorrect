@@ -20,10 +20,19 @@ enum class EMeshToUse : uint8
 };
 
 UENUM(BlueprintType)
+enum class EMeshRollType : uint8
+{
+	E_None UMETA(DisplayName = "None"),
+	E_Incremental UMETA(DisplayName = "Incremental"),
+	E_Random UMETA(DisplayName = "Random")
+};
+
+UENUM(BlueprintType)
 enum class EMeshScalingType : uint8
 {
 	E_None UMETA(DisplayName = "None"),
 	E_Numerical UMETA(DisplayName = "Numerical"),
+	E_SplineScale UMETA(DisplayName = "Spline Scale"),
 	E_UniformCurve UMETA(DisplayName = "Uniform from Curve"),
 	E_NonUniformCurve UMETA(DisplayName = "X and Y from Curve")
 };
@@ -130,6 +139,14 @@ public:
 	UFUNCTION()
 	FStartEndScale GetScaleMesh(int i);
 
+	UPROPERTY( EditAnywhere, BlueprintReadWrite,DisplayName = "Mesh Rotation Type", Category = "SplineMesh Properties")
+	EMeshRollType MeshRollType;
+
+	UPROPERTY( EditAnywhere, BlueprintReadWrite,DisplayName = "Mesh Roll Increment", Category = "SplineMesh Properties")
+	float RollIncrement = 60.f;
+
+	UFUNCTION()
+	float GetRollMesh(int i);
 
 	UFUNCTION()
 	void AddDirectionArrows();

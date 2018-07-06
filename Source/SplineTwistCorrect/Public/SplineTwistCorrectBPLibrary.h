@@ -72,7 +72,8 @@ class USplineTwistCorrectBPLibrary : public UBlueprintFunctionLibrary
         const class AActor *Actor,
         class UMaterialInterface* Material, 
         class UStaticMesh *StaticMesh,
-        const struct FStartEndScale StartEndScale);
+        const struct FStartEndScale StartEndScale,
+        const float Roll = 0);
 
     /** Input a Spline to offset with offset distance and rotation from the spline's up vector at each point */
     UFUNCTION(BlueprintCallable, meta = (DisplayName = "Build Offset Spline", Keywords = "SplineTwistCorrect TwistCorrect SplineCorrect"), Category = "SplineTwistCorrect")

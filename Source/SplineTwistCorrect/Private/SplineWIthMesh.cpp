@@ -113,6 +113,11 @@ bool USplineWithMesh::CanEditChange(const UProperty *InProperty) const
 			return (MeshScalingType == EMeshScalingType::E_UniformCurve || MeshScalingType == EMeshScalingType::E_NonUniformCurve);
 		}
 
+		if(FCString::Strcmp(*PropertyName, TEXT("RollIncrement")) == 0)
+		{
+			return (MeshRollType == EMeshRollType::E_Incremental || MeshRollType == EMeshRollType::E_Random);
+		}
+
 
 
 	}
@@ -206,7 +211,7 @@ void USplineWithMesh::AddMesh(class AActor *PActor)
 		}
 		else
 			StaticMesh = StaticMeshDefault;
-		USplineTwistCorrectBPLibrary::ConfigSplineMesh(i, Length, CorrectedSpline, SplineMesh, Actor, Material, StaticMesh, GetScaleMesh(i));
+		USplineTwistCorrectBPLibrary::ConfigSplineMesh(i, Length, CorrectedSpline, SplineMesh, Actor, Material, StaticMesh, GetScaleMesh(i), GetRollMesh(i));
 
 		SplineMesh->RegisterComponent();
 		SplineMeshArray.Add(SplineMesh);
@@ -319,6 +324,31 @@ FStartEndScale USplineWithMesh::GetScaleMesh(int i)
 		StartEndScale.Start = FVector2D(scaleS.X, scaleS.Y);
 		StartEndScale.End = FVector2D(scaleE.X, scaleE.Y);
 	}
+	else if (MeshScalingType == EMeshScalingType::E_SplineScale)
+	{
+		FVector scaleS;
+		FVector scaleE;
+		float t = fi/(CorrectedSpline->GetNumberOfSplinePoints()-1);
+		float t2 = (fi+1)/(CorrectedSpline->GetNumberOfSplinePoints()-1);
+		scaleS = this->GetScaleAtTime(fi/float(CorrectedSpline->GetNumberOfSplinePoints()-1), true);
+		scaleE = this->GetScaleAtTime(t2, true);
+		StartEndScale.Start = FVector2D(scaleS.Y, scaleS.Z);
+		StartEndScale.End = FVector2D(scaleE.Y, scaleE.Z);
+	}
 
 	return StartEndScale;
+}
+
+float USplineWithMesh::GetRollMesh(int i)
+{
+
+	if (MeshRollType == EMeshRollType::E_Incremental)
+	{
+		return i*RollIncrement;
+	}
+	else if (MeshRollType == EMeshRollType::E_Random)
+	{
+		return UKismetMathLibrary::RandomInteger(360)*RollIncrement;
+	}
+	else return 0.f;
 }
