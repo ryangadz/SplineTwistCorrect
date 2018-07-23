@@ -72,7 +72,7 @@ void USplineTwistCorrectBPLibrary::ConfigSplineMesh(
 	const class AActor *Actor,
 	class UMaterialInterface *Material,
 	class UStaticMesh *StaticMesh,
-	const FStartEndScale StartEndScale,
+	const FStartEndScale2 StartEndScale,
 	const float Roll)
 {
 	if (!SplineFinal || !SplineMesh || !Actor)

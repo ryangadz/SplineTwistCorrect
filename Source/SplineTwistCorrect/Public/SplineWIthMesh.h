@@ -6,7 +6,7 @@
 #include "Components/SplineComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Runtime/Engine/Classes/Curves/CurveVector.h"
-#include "SplineMeshStructsPCH.h"
+#include "StartEndScale.h"
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
 #include "SplineTwistCorrectBPLibrary.h"
 #include "SplineWithMesh.generated.h"
@@ -97,7 +97,7 @@ public:
 	UPROPERTY()
 	class UArrowComponent* Arrow;
 
-	UPROPERTY()
+	UPROPERTY(interp, BlueprintReadWrite,  DisplayName = "Spline Mesh", Category = "SplineMesh Properties", AdvancedDisplay)
 	class USplineMeshComponent* SplineMesh;
 
 	UPROPERTY()
@@ -137,7 +137,7 @@ public:
 	class UCurveVector *ScaleCurve;
 
 	UFUNCTION()
-	FStartEndScale GetScaleMesh(int i);
+	FStartEndScale2 GetScaleMesh(int i);
 
 	UPROPERTY( EditAnywhere, BlueprintReadWrite,DisplayName = "Mesh Rotation Type", Category = "SplineMesh Properties")
 	EMeshRollType MeshRollType;

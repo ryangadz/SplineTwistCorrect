@@ -297,10 +297,10 @@ void USplineWithMesh::RemoveDirectionArrows()
 // 	return StartEndScale;
 // }
 
-FStartEndScale USplineWithMesh::GetScaleMesh(int i)
+FStartEndScale2 USplineWithMesh::GetScaleMesh(int i)
 {
 	float fi = float(i);
-	struct FStartEndScale StartEndScale;
+	struct FStartEndScale2 StartEndScale;
 	if (MeshScalingType == EMeshScalingType::E_Numerical)
 	{
 		StartEndScale.Start = FVector2D(Scale, Scale);

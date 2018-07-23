@@ -5,7 +5,7 @@
 #include "Runtime/Engine/Classes/Components/SplineMeshComponent.h"
 #include "Runtime/Engine/Classes/GameFramework/Actor.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
-#include "SplineMeshStructsPCH.h"
+#include "StartEndScale.h"
 #include "Runtime/Engine/Classes/Kismet/KismetMathLibrary.h"
 #include "SplineTwistCorrectBPLibrary.generated.h"
  
@@ -72,7 +72,7 @@ class USplineTwistCorrectBPLibrary : public UBlueprintFunctionLibrary
         const class AActor *Actor,
         class UMaterialInterface* Material, 
         class UStaticMesh *StaticMesh,
-        const struct FStartEndScale StartEndScale,
+        const struct FStartEndScale2 StartEndScale,
         const float Roll = 0);
 
     /** Input a Spline to offset with offset distance and rotation from the spline's up vector at each point */

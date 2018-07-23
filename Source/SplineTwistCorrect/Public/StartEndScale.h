@@ -1,10 +1,11 @@
  #pragma once
  
- #include "SplineMeshStructsPCH.generated.h"
+ #include "Engine/UserDefinedStruct.h"
+ #include "StartEndScale.generated.h"
 
 
  USTRUCT (BlueprintType)
- struct FStartEndScale
+ struct FStartEndScale2
  {
     GENERATED_USTRUCT_BODY()
 
@@ -16,7 +17,7 @@
     FVector2D End;
 
 public:
-    FStartEndScale()
+    FStartEndScale2()
     {
         Start = FVector2D(1,1);
         End   = FVector2D(1,1);
