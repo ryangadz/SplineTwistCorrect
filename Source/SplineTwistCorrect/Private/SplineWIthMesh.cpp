@@ -7,7 +7,7 @@ USplineWithMesh::USplineWithMesh(const FObjectInitializer &ObjectInitializer) : 
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
 
 	static ConstructorHelpers::FObjectFinder<UObject> DefaultMesh(TEXT("StaticMesh'/SplineTwistCorrect/SM_DebugSpline.SM_DebugSpline'"));
 	if (DefaultMesh.Object != NULL)                             
@@ -163,7 +163,7 @@ void USplineWithMesh::BeginPlay()
 void USplineWithMesh::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
+	//AddMesh(Actor);
 	// ...
 }
 
@@ -179,7 +179,7 @@ void USplineWithMesh::AddMesh(class AActor *PActor)
 	USplineTwistCorrectBPLibrary::CalcRailLength(this, Number, Length, SubSegmentLength);
 	OffsetSpline->SetClosedLoop(this->IsClosedLoop(), true);
 	CorrectedSpline->SetClosedLoop(this->IsClosedLoop(), true);
-	USplineTwistCorrectBPLibrary::BuildOffsetSpline(this, OffsetSpline, 0.f, 30.f);
+	USplineTwistCorrectBPLibrary::BuildOffsetSpline(this, OffsetSpline, 0.f, 1.f);
 	USplineTwistCorrectBPLibrary::BuildCorrectedSpline(this, OffsetSpline, CorrectedSpline, Length);
 	//	GEngine->AddOnScreenDebugMessage(-1, 4.f, FColor::Red, FString::Printf(TEXT("number %i"), Number));
 	//	SplineMeshArray.SetNum(Number, true);
@@ -267,6 +267,7 @@ void USplineWithMesh::AddDirectionArrows()
 		Arrow->SetRelativeRotation(UKismetMathLibrary::MakeRotFromX(upVector));
 		Arrow->RegisterComponent();
 		DirectionArrows.Add(Arrow);
+		Arrow->SetHiddenInGame(false);
 	
 	}
 }
