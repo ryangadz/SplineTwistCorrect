@@ -108,7 +108,7 @@ public:
 
 
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, DisplayName = "Add Mesh", Category = "SplineMesh Properties")
 	void AddMesh(class AActor * PActor);
 
 
@@ -148,10 +148,10 @@ public:
 	UFUNCTION()
 	float GetRollMesh(int i);
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, DisplayName = "Add Direction Arrows", Category = "Spline Properties")
 	void AddDirectionArrows();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, DisplayName = "Remove Direction Arrows", Category = "Spline Properties")
 	void RemoveDirectionArrows();
 
 #if WITH_EDITORONLY_DATA
