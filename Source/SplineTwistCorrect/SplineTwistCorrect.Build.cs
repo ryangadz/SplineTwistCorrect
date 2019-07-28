@@ -10,7 +10,7 @@ public class SplineTwistCorrect : ModuleRules
 		
 		PublicIncludePaths.AddRange(
 			new string[] {
-				"SplineTwistCorrect/Public"
+				"SplineTwistCorrect/Public",
 				
 				// ... add public include paths required here ...
 			}

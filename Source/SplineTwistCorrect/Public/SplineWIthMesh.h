@@ -34,7 +34,8 @@ enum class EMeshScalingType : uint8
 	E_Numerical UMETA(DisplayName = "Numerical"),
 	E_SplineScale UMETA(DisplayName = "Spline Scale"),
 	E_UniformCurve UMETA(DisplayName = "Uniform from Curve"),
-	E_NonUniformCurve UMETA(DisplayName = "X and Y from Curve")
+	E_NonUniformCurve UMETA(DisplayName = "X and Y from Curve"),
+	E_CurveScaled UMETA(DisplayName = "X from Curve Scaled")
 };
 
 UCLASS( ClassGroup=(SplineTwistCorrect), meta=(BlueprintSpawnableComponent) )
@@ -111,7 +112,7 @@ public:
 	UFUNCTION(BlueprintCallable, DisplayName = "Add Mesh", Category = "SplineMesh Properties")
 	void AddMesh(class AActor * PActor);
 
-
+	UFUNCTION(BlueprintCallable, DisplayName = "Remove Mesh", Category = "SplineMesh Properties")
 	void RemoveMesh();
 
  	UFUNCTION()

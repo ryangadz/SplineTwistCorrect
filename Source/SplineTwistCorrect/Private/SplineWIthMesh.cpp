@@ -106,7 +106,7 @@ bool USplineWithMesh::CanEditChange(const UProperty *InProperty) const
 		FString PropertyName = InProperty->GetName();
 		if (FCString::Strcmp(*PropertyName, TEXT("Scale")) == 0)
 		{
-			return MeshScalingType == EMeshScalingType::E_Numerical;
+			return (MeshScalingType == EMeshScalingType::E_Numerical || MeshScalingType == EMeshScalingType::E_CurveScaled);
 		}
 		else if (FCString::Strcmp(*PropertyName, TEXT("ScaleCurve")) == 0)
 		{
@@ -212,7 +212,7 @@ void USplineWithMesh::AddMesh(class AActor *PActor)
 		else
 			StaticMesh = StaticMeshDefault;
 		USplineTwistCorrectBPLibrary::ConfigSplineMesh(i, Length, CorrectedSpline, SplineMesh, Actor, Material, StaticMesh, GetScaleMesh(i), GetRollMesh(i));
-
+	//	SplineMesh->SetCollisionEnabled()
 		SplineMesh->RegisterComponent();
 		SplineMeshArray.Add(SplineMesh);
 	}
@@ -316,6 +316,7 @@ FStartEndScale2 USplineWithMesh::GetScaleMesh(int i)
 		StartEndScale.Start = FVector2D(scaleS.X, scaleS.X);
 		StartEndScale.End = FVector2D(scaleE.X, scaleE.X);
 	}
+	
 	else if (MeshScalingType == EMeshScalingType::E_NonUniformCurve)
 	{
 		FVector scaleS;
@@ -335,6 +336,15 @@ FStartEndScale2 USplineWithMesh::GetScaleMesh(int i)
 		scaleE = this->GetScaleAtTime(t2, true);
 		StartEndScale.Start = FVector2D(scaleS.Y, scaleS.Z);
 		StartEndScale.End = FVector2D(scaleE.Y, scaleE.Z);
+	}
+	else if (MeshScalingType == EMeshScalingType::E_CurveScaled)
+	{
+		FVector scaleS;
+		FVector scaleE;
+		scaleS = ScaleCurve->GetVectorValue(fi/(CorrectedSpline->GetNumberOfSplinePoints()-1))*Scale;
+		scaleE = ScaleCurve->GetVectorValue((fi+1)/(CorrectedSpline->GetNumberOfSplinePoints()-1))*Scale;
+		StartEndScale.Start = FVector2D(scaleS.X, scaleS.X);
+		StartEndScale.End = FVector2D(scaleE.X, scaleE.X);
 	}
 
 	return StartEndScale;
