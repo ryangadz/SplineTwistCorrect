@@ -6,8 +6,10 @@ void USTC_MathFunctions::CalcIcosahedron(
     TArray<FVector> &Vertices,
     const float Radius)
 {
-    float G = ((FMath::Sqrt(5) + 1) / 2);
-    float M = FMath::Sqrt((FMath::Pow(G, 2)) + 1);
+   // float G = ((FMath::Sqrt(5) + 1) / 2);
+    float G = 1.61803399;
+  //  float M = FMath::Sqrt((FMath::Pow(G, 2)) + 1);
+    float M = 1.90211303;
     float X = (G * Radius) / M;
     float Y = Radius / M;
     Vertices.Add(FVector(Y, X, 0.0f));
@@ -42,8 +44,8 @@ bool USTC_MathFunctions::FindNextSplineLocation(
     float ClosestDistance = SegmentLength * 1.5;
     TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
     ObjectTypes.Add(EObjectTypeQuery::ObjectTypeQuery1);
+    ObjectTypes.Add(EObjectTypeQuery::ObjectTypeQuery2);
     TArray<AActor *> ActorsToIgnore;
-    ActorsToIgnore.Add(NULL); //none
     FHitResult HitData(ForceInit);
     FVector Start;
     FVector End;
@@ -53,7 +55,8 @@ bool USTC_MathFunctions::FindNextSplineLocation(
     FVector NextUpVec;
     bool BlockHit;
     // UObject Object =
-    for (int32 i = 0; i < 12; i++)
+    int32 len = IcoVertices.Num();
+    for (int32 i = 0; i < len; ++i)
     {
         float TempLength;
         Start = FVector(PreLocation - IcoVertices[i]);
