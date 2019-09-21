@@ -108,10 +108,11 @@ public:
 	class AActor *Actor;
 
 
-
+	//Adds spline mesh entire lenght of spline (old mesh are removed automatically)
 	UFUNCTION(BlueprintCallable, DisplayName = "Add Mesh", Category = "SplineMesh Properties")
 	void AddMesh(class AActor * PActor);
 
+	//Removes all spline mesh components
 	UFUNCTION(BlueprintCallable, DisplayName = "Remove Mesh", Category = "SplineMesh Properties")
 	void RemoveMesh();
 

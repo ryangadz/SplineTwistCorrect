@@ -26,7 +26,7 @@ class SPLINETWISTCORRECT_API USTC_MathFunctions : public UBlueprintFunctionLibra
         const float Radius=10);
 
 	/** Input a radius for points on a icosahedron. */
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Find Next Spline Location", Keywords = "SplineTwistCorrect TwistCorrect SplineCorrect",WorldContext = "WorldContextObject", CallableWithoutWorldContext), Category = "STC Math Functions")
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Find Next Spline Location", Keywords = "SplineTwistCorrect TwistCorrect SplineCorrect"), Category = "STC Math Functions")
 	static bool FindNextSplineLocation(
 		UObject* WorldContextObject,
 		FVector &NextLocation,
